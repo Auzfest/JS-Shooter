@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="styles/base.css">
+<title>Top-Down Shooter</title>
+
+</head>
+<body>
+    <div class="gamebuttons">
+        <button id="restartButton">Restart Game</button>
+        <button id="pauseButton">Pause Game</button>
+        <h3>Controls</h3>
+        <p>
+            PC: use WASD to move and the mouse to aim. Right click to fire.<br>
+            Mobile: use the buttons below to move and touch the screen to fire.
+        </p>
+    </div>
+    <div class="gamegrid">
+        <canvas id="gameCanvas"></canvas>
+        <div class="buttongrid">
+            <button class="up">⬆️</button>
+            <button class="left">⬅️</button>
+            <button class="right">➡️</button>
+            <button class="down">⬇️</button>
+        </div>
+    </div>
+
+</body>
+<script src="scripts/gamefunctions.js"></script>
+</html>

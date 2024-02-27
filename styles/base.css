@@ -1,0 +1,95 @@
+body {
+    margin: 0;
+    overflow: hidden;
+    text-align: center;
+    justify-content: center;
+    display: grid;
+}
+
+canvas {
+    display: block;
+}
+
+.gamebuttons {
+    grid-column: 2/3;
+    grid-row: 1/2;
+}
+
+.gamegrid {
+    grid-row: 1/2;
+    text-align: center;
+    margin: 1rem;
+    margin-bottom: 5%;
+}
+
+#gameCanvas {
+    background-color: #444;
+    width: auto;
+    margin: auto;
+    margin-top: 1%;
+}
+
+.buttongrid {
+    display: none;
+}
+
+.Controls {
+    grid-column: 2/3;
+    grid-row: 2/3;
+    text-align: center;
+    margin: auto;
+}
+
+button {
+    padding: 10px 20px;
+    font-size: 18px;
+    border: none;
+    border-radius: 5px;
+    margin: auto;
+}
+
+@media screen and (max-width: 500px) {
+.gamegrid {
+    grid-row: 3/4;
+}
+
+.gamebuttons {
+    grid-column: 1/2;
+    grid-row: 1/2;
+    text-align: center;
+    margin: auto;
+}
+
+.buttongrid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    justify-content: center;
+    align-items: center;
+    margin-top: 50px;
+}
+
+.up, .down, .left, .right {
+    padding: 10px 20px;
+    font-size: 18px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.up {
+    grid-column: 2;
+}
+
+.down {
+    grid-column: 2;
+}
+
+.left {
+    grid-column: 1;
+}
+
+.right {
+    grid-column: 3;
+}
+}
