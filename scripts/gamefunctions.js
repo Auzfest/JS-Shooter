@@ -42,7 +42,9 @@ class Enemy {
 
     draw() {
         ctx.fillStyle = "red";
-        ctx.fillRect(this.x - this.size / 2, this.y - this.size / 2, this.size, this.size);
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size / 2, 0, Math.PI * 2);
+        ctx.fill();
     }
 
     moveTowardsPlayer() {
@@ -59,33 +61,63 @@ class Enemy {
 // Array to store enemies
 const enemies = [];
 
+let mouseX = 0;
+let mouseY = 0;
+
 // Mouse event to rotate gun
 canvas.addEventListener("mousemove", event => {
-    const mouseX = event.clientX - canvas.getBoundingClientRect().left;
-    const mouseY = event.clientY - canvas.getBoundingClientRect().top;
+    mouseX = event.clientX - canvas.getBoundingClientRect().left;
+    mouseY = event.clientY - canvas.getBoundingClientRect().top;
+    gunMove(mouseX, mouseY);
+});
+
+function gunMove(mouseX, mouseY) {
     const dx = mouseX - player.x;
     const dy = mouseY - player.y;
     gun.angle = Math.atan2(dy, dx);
-});
+}
 
 // Mouse event to shoot
 canvas.addEventListener("mousedown", event => {
     if (event.button === 0) {
-        const bulletSpeed = 10; // Set bullet speed
-        const bulletDirectionX = Math.cos(gun.angle); // Calculate x component of bullet direction
-        const bulletDirectionY = Math.sin(gun.angle); // Calculate y component of bullet direction
+        startFiring();
+    }
+});
+
+let firingInterval; 
+
+// Function to start firing bullets
+function startFiring() {
+    firingInterval = setInterval(() => {
+        const gunSound = document.getElementById("gunSound");
+        gunSound.playbackRate = 10.0; 
+        gunSound.play();
+
+        gunMove(mouseX, mouseY);
+
+        const bulletSpeed = 10; 
+        const bulletDirectionX = Math.cos(gun.angle); 
+        const bulletDirectionY = Math.sin(gun.angle); 
         const newBullet = {
-            size: canvasWidth * 0.005, // Define size property
-            speed: bulletSpeed, // Define speed property
-            directionX: bulletDirectionX, // Store x component of bullet direction
-            directionY: bulletDirectionY, // Store y component of bullet direction
+            size: canvasWidth * 0.005, 
+            speed: bulletSpeed,
+            directionX: bulletDirectionX, 
+            directionY: bulletDirectionY, 
             x: player.x,
             y: player.y,
             isVisible: true
         };
-        bullets.push(newBullet); // Add new bullet to the array
+        bullets.push(newBullet);
+    }, 200); 
+}
+
+// Event listener for mouse up
+canvas.addEventListener("mouseup", event => {
+    if (event.button === 0) {
+        clearInterval(firingInterval);
     }
 });
+
 // Keyboard event listeners
 document.addEventListener('keydown', keyDownHandler);
 document.addEventListener('keyup', keyUpHandler);
@@ -119,6 +151,37 @@ function keyUpHandler(event) {
     }
 }
 
+/* canvas.addEventListener("touchstart", handleTouchShoot);
+
+canvas.addEventListener("touchmove", handleTouchMove);
+
+canvas.addEventListener("touchend", () => {
+    clearInterval(firingInterval);
+});
+
+// Function to handle touch events for shooting
+function handleTouchShoot(event) {
+    // Get touch coordinates
+    const touchX = event.touches[0].clientX - canvas.getBoundingClientRect().left;
+    const touchY = event.touches[0].clientY - canvas.getBoundingClientRect().top;
+    gun.angle = Math.atan2(touchY - player.y, touchX - player.x);
+    startFiring()
+}
+
+function handleTouchMove(event) {
+    // Prevent default touch behavior (e.g., scrolling)
+    event.preventDefault();
+
+    // Get touch coordinates
+    const touchX = event.touches[0].clientX - canvas.getBoundingClientRect().left;
+    const touchY = event.touches[0].clientY - canvas.getBoundingClientRect().top;
+
+    // Update gun angle based on touch coordinates
+    gun.angle = Math.atan2(touchY - player.y, touchX - player.x);
+}
+
+
+
 function handleTouch(button, pressAction, releaseAction) {
     button.addEventListener('touchstart', () => {
         pressAction();
@@ -151,7 +214,7 @@ handleTouch(document.querySelector('.right'), () => {
     rightPressed = true;
 }, () => {
     rightPressed = false;
-});
+}); */
 
 // Function to check collision between player and enemies
 function checkPlayerEnemyCollision() {
@@ -214,6 +277,9 @@ function update() {
                     if (distance < bullet.size / 2 + enemy.size / 2) {
                         enemies.splice(enemyIndex, 1);
                         bullets.splice(bulletIndex, 1);
+                        const enemyShotSound = document.getElementById("enemyShotSound");
+                        enemyShotSound.playbackRate = 3.0;
+                        enemyShotSound.play();
                         score += 10;
                     }
                 }
@@ -237,6 +303,7 @@ function handleGameOver() {
     ctx.fillStyle = "white";
     ctx.font = "bold 100% Arial";
     ctx.fillText("Game Over", canvas.width / 2, canvas.height / 2);
+    ctx.fillText("Score: " + score, canvas.width /2, canvas.height / 2 + 30);
 }
 
 // Event listener for restart button
@@ -247,6 +314,11 @@ restartButton.addEventListener("click", () => {
     score = 0;
     enemies.length = 0; // Clear enemies array
     resetPlayerPosition(); // Reset player position
+
+    clearInterval(intervalId);
+    currInterval = 5000;
+    enemySpawnCount = 3;
+    intervalId = setInterval(updateCurrent, 60 * 1000);
     // Restart game loop
     gameLoop();
 });
@@ -290,7 +362,9 @@ function render() {
 
     // Draw player
     ctx.fillStyle = "blue";
-    ctx.fillRect(player.x - player.size / 2, player.y - player.size / 2, player.size, player.size);
+    ctx.beginPath();
+    ctx.arc(player.x, player.y, player.size / 2, 0, Math.PI * 2);
+    ctx.fill();
 
     // Draw gun
     ctx.save();
@@ -351,14 +425,19 @@ function startEnemySpawning() {
 }
 
 function updateCurrent() {
-    currInterval -= 500;
-    enemySpawnCount += 2;
+    if (gameOver == true) {
+        currInterval = 5000;
+        enemySpawnCount = 3;
+    }
+    else {
+        currInterval -= 500;
+        enemySpawnCount += 2;
+    }
 }
 
-setInterval(updateCurrent, 60 * 1000); // 1 minute
-setInterval(updateCurrent, 5 * 60 * 1000); // 5 minutes
-setInterval(updateCurrent, 10 * 60 * 1000); // 10 minutes
-setInterval(updateCurrent, 15 * 60 * 1000); // 15 minutes
+
+let intervalId = setInterval(updateCurrent, 60 * 1000); // 1 minute
+
 
 // Function to spawn enemies at random edges
 function spawnEnemy() {
